@@ -88,7 +88,7 @@ async def generate_eqhistogram_plot(
     string_io = StringIO(contents.decode("utf-8"))
     df = pd.read_csv(string_io)
     headers = df.columns.tolist()
-    data = df[headers[0]].to_numpy()
+    data = df[headers[0]].to_numpy(dtype=float)
     pdf_buffer = pltpdf.eqhistogram(data, bins, xlabel, ylabel, size)
     return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=eqhistogram.pdf"})
 
