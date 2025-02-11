@@ -60,11 +60,11 @@ def scatter(df: pd.DataFrame, headers: list[str], size: str):
 def errorbar1x(df: pd.DataFrame, headers: list[str], size: str):
   x = df[headers[0]].to_numpy(dtype=float)
   y =  df[headers[1]].to_numpy(dtype=float)
+  error = df[headers[2]]
   if len(x) != len(y) or len(x) != len(error):
     raise ValueError("Columns must have the same length")
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
-  error = df[headers[2]]
   ax.errorbar(x, y, xerr=error, fmt='o', capsize=5)
   ax.set_xlabel(headers[0])
   ax.set_ylabel(headers[1])
@@ -80,11 +80,11 @@ def errorbar1x(df: pd.DataFrame, headers: list[str], size: str):
 def errorbar1y(df: pd.DataFrame, headers: list[str], size: str):
   x = df[headers[0]].to_numpy(dtype=float)
   y =  df[headers[1]].to_numpy(dtype=float)
+  error = df[headers[2]].to_numpy(dtype=float)
   if len(x) != len(y) or len(x) != len(error):
     raise ValueError("Columns must have the same length")
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
-  error = df[headers[2]].to_numpy(dtype=float)
   ax.errorbar(x, y, yerr=error, fmt='o', capsize=5)
   ax.set_xlabel(headers[0])
   ax.set_ylabel(headers[1])
