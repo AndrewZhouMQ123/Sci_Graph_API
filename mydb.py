@@ -1,19 +1,34 @@
-from sqlalchemy import create_engine, Column, String, Boolean, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import Integer, create_engine, Column, String, Boolean, DateTime
+from sqlalchemy.orm import sessionmaker, Session, declarative_base
+from dotenv import load_dotenv
 import os
 import datetime
 from fastapi import HTTPException, Header, Depends
 import secrets
 
 Base = declarative_base()
+load_dotenv()
 USER = os.getenv("user")
 PASSWORD = os.getenv("password")
 HOST = os.getenv("host")
 PORT = os.getenv("port")
 DBNAME = os.getenv("dbname")
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+print(DATABASE_URL)
 engine = create_engine(DATABASE_URL)
+
+def generate_api_key():
+  return secrets.token_hex(32)
+
+class APIKey(Base):
+  __tablename__ = "api_keys"
+  id = Column(Integer, primary_key=True, index=True)
+  key = Column(String, unique=True, nullable=False)
+  active = Column(Boolean, default=True)
+  expires_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30))
+
+def init_db():
+  Base.metadata.create_all(bind=engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db():
@@ -22,17 +37,6 @@ def get_db():
     yield db
   finally:
     db.close()
-
-class APIKey(Base):
-  __tablename__ = "api_keys"
-  key = Column(String, primary_key=True, index=True)
-  active = Column(Boolean, default=True)
-  expires_at = Column(DateTime, default=lambda: datetime.datetime.utcnow() + datetime.timedelta(days=30))
-
-Base.metadata.create_all(bind=engine)
-
-def generate_api_key():
-  return secrets.token_hex(32)
 
 def save_api_key(api_key: str, db: Session):
   expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)

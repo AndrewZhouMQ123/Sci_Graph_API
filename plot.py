@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')  # Force non-GUI backend
 import matplotlib.pyplot as plt
 import numpy as np
 from io import BytesIO
@@ -5,31 +7,33 @@ import pandas as pd
 import scipy
 
 def line(a: float, b: float, domain: list[float], range: list[float], num: int):
-  x = np.linspace(-domain[0], domain[1], num)
+  x = np.linspace(domain[0], domain[1], num)
   fig = plt.figure(1, figsize=(3.375, 3))
   ax = fig.add_subplot(111)
   ax.plot(x, a*x + b)
   ax.set_xlabel("x")
   ax.set_ylabel("y")
   ax.set_title("y = ax + b")
-  ax.set_ylim(-range[0], range[1])
+  ax.set_xlim(domain[0], domain[1])
+  ax.set_ylim(range[0], range[1])
   ax.grid()
   fig.tight_layout()
   buf = BytesIO()
-  fig.savefig(buf, format="pdf")
+  fig.savefig(buf, format="pdf", bbox_inches='tight')
   buf.seek(0)
   plt.close(fig)
   return buf
 
 def quadratic(a: float, b: float, c: float, domain: list[float], range: list[float], num: int):
-  x = np.linspace(-domain[0], domain[1], num)
+  x = np.linspace(domain[0], domain[1], num)
   fig = plt.figure(1, figsize=(3.375, 3))
   ax = fig.add_subplot(111)
   ax.plot(x, a*x**2 + b*x + c)
   ax.set_xlabel("x")
   ax.set_ylabel("y")
   ax.set_title("y = ax^2 + bx + c")
-  ax.set_ylim(-range[0], range[1])
+  ax.set_xlim(domain[0], domain[1])
+  ax.set_ylim(range[0], range[1])
   ax.grid()
   fig.tight_layout()
   buf = BytesIO()
@@ -57,7 +61,7 @@ def scatter(df: pd.DataFrame, headers: list[str], size: str):
   plt.close(fig)
   return buf
 
-def errorbar1x(df: pd.DataFrame, headers: list[str], size: str):
+def errbar1x(df: pd.DataFrame, headers: list[str], size: str):
   x = df[headers[0]].to_numpy(dtype=float)
   y =  df[headers[1]].to_numpy(dtype=float)
   error = df[headers[2]]
@@ -77,7 +81,7 @@ def errorbar1x(df: pd.DataFrame, headers: list[str], size: str):
   plt.close(fig)
   return buf
 
-def errorbar1y(df: pd.DataFrame, headers: list[str], size: str):
+def errbar1y(df: pd.DataFrame, headers: list[str], size: str):
   x = df[headers[0]].to_numpy(dtype=float)
   y =  df[headers[1]].to_numpy(dtype=float)
   error = df[headers[2]].to_numpy(dtype=float)
@@ -97,7 +101,7 @@ def errorbar1y(df: pd.DataFrame, headers: list[str], size: str):
   plt.close(fig)
   return buf
 
-def errorbar2xy(df: pd.DataFrame, headers: list[str], size: str):
+def errbar2xy(df: pd.DataFrame, headers: list[str], size: str):
   x = df[headers[0]].to_numpy(dtype=float)
   y =  df[headers[1]].to_numpy(dtype=float)
   error_x = df[headers[2]].to_numpy(dtype=float)
@@ -118,7 +122,7 @@ def errorbar2xy(df: pd.DataFrame, headers: list[str], size: str):
   plt.close(fig)
   return buf
 
-def eqhistogram(data: list[int], bins: int, xlabel: str, ylabel: str, size: str):
+def eqhist(data: list[int], bins: int, xlabel: str, ylabel: str, size: str):
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
   ax.hist(data, bins=bins)
@@ -132,7 +136,7 @@ def eqhistogram(data: list[int], bins: int, xlabel: str, ylabel: str, size: str)
   plt.close(fig)
   return buf
 
-def varyhistogram(df: pd.DataFrame, headers: list[str], size: str):
+def varyhist(df: pd.DataFrame, headers: list[str], size: str):
   bins = df[headers[0]].to_numpy()
   counts = df[headers[1]].to_numpy()
   if len(counts) != len(bins):
