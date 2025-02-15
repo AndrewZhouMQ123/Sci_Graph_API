@@ -13,7 +13,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    environment: production
+    environment: sci-graph-api
     env:
       user: ${{ secrets.USER }}
       password: ${{ secrets.PASSWORD }}
