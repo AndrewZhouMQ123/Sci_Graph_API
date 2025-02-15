@@ -8,11 +8,13 @@ import secrets
 
 Base = declarative_base()
 load_dotenv()
-USER = os.getenv("USER")
-PASSWORD = os.getenv("PASSWORD")
-HOST = os.getenv("HOST")
-PORT = os.getenv("PORT")
-DBNAME = os.getenv("DBNAME")
+USER = os.getenv("user")
+PASSWORD = os.getenv("password")
+HOST = os.getenv("host")
+PORT = os.getenv("port")
+DBNAME = os.getenv("dbname")
+if not all([USER, PASSWORD, HOST, PORT, DBNAME]):
+  raise ValueError("One or more required environment variables are missing!")
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
 engine = create_engine(DATABASE_URL)
 
