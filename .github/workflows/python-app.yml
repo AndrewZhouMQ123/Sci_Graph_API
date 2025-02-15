@@ -16,6 +16,12 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      user: ${{ secrets.USER }}
+      password: ${{ secrets.PASSWORD }}
+      host: ${{ secrets.HOST }}
+      port: ${{ secrets.PORT }}
+      dbname: ${{ secrets.DBNAME }}
 
     steps:
     - uses: actions/checkout@v4

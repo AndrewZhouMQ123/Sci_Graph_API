@@ -56,7 +56,7 @@ def test_polyfit_singlecolumn():
       data={"poly_degree": "1", "size": "small"}
     )
   assert response.status_code == 400
-  assert response.json()["detail"] == "CSV must contain at least 2 columns"
+  assert response.json()["detail"] == "Missing column or data!"
 
 def test_expfit():
   csv_path = os.path.join(os.path.dirname(__file__), "data.csv")
@@ -79,7 +79,7 @@ def test_expfit_singlecolumn():
       data={"size": "small"}
     )
   assert response.status_code == 400
-  assert response.json()["detail"] == "CSV must contain at least 2 columns"
+  assert response.json()["detail"] == "Missing column or data!"
 
 def test_logfit():
   csv_path = os.path.join(os.path.dirname(__file__), "data.csv")
@@ -102,7 +102,7 @@ def test_logfit_singlecolumn():
       data={"size": "small"}
     )
   assert response.status_code == 400
-  assert response.json()["detail"] == "CSV must contain at least 2 columns"
+  assert response.json()["detail"] == "Missing column or data!"
 
 def test_gaussfit():
   csv_path = os.path.join(os.path.dirname(__file__), "data.csv")
@@ -125,7 +125,7 @@ def test_gaussfit_singlecolumn():
       data={"size": "small"}
     )
   assert response.status_code == 400
-  assert response.json()["detail"] == "CSV must contain at least 2 columns"
+  assert response.json()["detail"] == "Missing column or data!"
 
 def test_powfit():
   csv_path = os.path.join(os.path.dirname(__file__), "data.csv")
@@ -148,7 +148,7 @@ def test_powfit_singlecolumn():
       data={"size": "small"}
     )
   assert response.status_code == 400
-  assert response.json()["detail"] == "CSV must contain at least 2 columns"
+  assert response.json()["detail"] == "Missing column or data!"
 
 def test_poissonfit():
   csv_path = os.path.join(os.path.dirname(__file__), "data.csv")
@@ -171,4 +171,16 @@ def test_poissonfit_singlecolumn():
       data={"size": "small"}
     )
   assert response.status_code == 400
-  assert response.json()["detail"] == "CSV must contain at least 2 columns"
+  assert response.json()["detail"] == "Missing column or data!"
+
+def test_scatter():
+  csv_path = os.path.join(os.path.dirname(__file__), "data.csv")
+  with open(csv_path, "rb") as csv_file:
+    response = client.post(
+      "/plot/scatter",
+      files={"file": ("data.csv", csv_file, "text/csv")},
+      data={"size": "small"}
+    )
+  assert response.status_code == 200
+  assert response.headers["content-type"] == "application/pdf"
+  assert "inline; filename=scatter.pdf" in response.headers["Content-Disposition"]

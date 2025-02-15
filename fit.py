@@ -10,6 +10,8 @@ from scipy.optimize import curve_fit
 def polyfit(data: np.ndarray, headers: list[str], poly_degree: int, size: str):
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   x, y = data[0], data[1]
+  if len(x) != len(y):
+    raise ValueError("Columns must have the same length")
   coeffs, cov = np.polyfit(x, y, poly_degree, cov=True)
   p = np.poly1d(coeffs)
   x_smooth = np.linspace(x.min(), x.max(), 300)
@@ -74,6 +76,8 @@ def power_law(x, A, B):
 
 def expfit(data: np.ndarray, headers: list[str], size: str):
   x, y = data[0], data[1]
+  if len(x) != len(y):
+    raise ValueError("Columns must have the same length")
   params, covariance = curve_fit(exp_model, x, y)
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
@@ -102,6 +106,8 @@ def expfit(data: np.ndarray, headers: list[str], size: str):
     
 def logfit(data: np.ndarray, headers: list[str], size: str):
   x, y = data[0], data[1]
+  if len(x) != len(y):
+    raise ValueError("Columns must have the same length")
   params, covariance = curve_fit(sigmoid, x, y)
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
@@ -130,6 +136,8 @@ def logfit(data: np.ndarray, headers: list[str], size: str):
     
 def gaussfit(data: np.ndarray, headers: list[str], size: str):
   x, y = data[0], data[1]
+  if len(x) != len(y):
+    raise ValueError("Columns must have the same length")
   params, covariance = curve_fit(gaussian, x, y)
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
@@ -158,6 +166,8 @@ def gaussfit(data: np.ndarray, headers: list[str], size: str):
     
 def powfit(data: np.ndarray, headers: list[str], size: str):
   x, y = data[0], data[1]
+  if len(x) != len(y):
+    raise ValueError("Columns must have the same length")
   params, covariance = curve_fit(power_law, x, y)
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
@@ -189,6 +199,8 @@ def poisson_model(x, lambd):
 
 def poissonfit(data: np.ndarray, headers: list[str], size: str):
   x, y = data[0], data[1]
+  if len(x) != len(y):
+    raise ValueError("Columns must have the same length")
   try:
     params, covariance = curve_fit(poisson_model, x, y, p0=[np.mean(x)])
   except Exception as e:

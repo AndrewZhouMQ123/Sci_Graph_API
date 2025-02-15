@@ -1,4 +1,4 @@
-from fastapi import APIRouter, File, UploadFile, Form
+from fastapi import APIRouter, File, UploadFile, Form, HTTPException
 from fastapi.responses import StreamingResponse
 import json
 from io import StringIO
@@ -35,45 +35,53 @@ def generate_quadratic_plot(params: str = Form(...)) -> StreamingResponse:
 @plot_router.post("/scatter")
 async def generate_scatter_plot(file: UploadFile = File(...), size: str = Form(...)) -> StreamingResponse:
   contents = await file.read()
-  string_io = StringIO(contents.decode("utf-8"))
-  df = pd.read_csv(string_io)
-  headers = df.columns.tolist()
-  if df is None or len(headers) < 2:
-    return {"error": "Incorrect data format"}
-  pdf_buffer = pltpdf.scatter(df, headers, size)
+  file_ext = file.filename.split(".")[-1].lower()
+  data, headers = helper.load_data(file_ext, contents)
+  if len(headers) < 2 or size is None:
+    raise HTTPException(status_code=400, detail="Missing column or data!")
+  try:
+    pdf_buffer = pltpdf.scatter(data, headers, size)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
   return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=scatter.pdf"})
 
 @plot_router.post("/errbar1x")
 async def generate_errbar1x_plot(file: UploadFile = File(...), size: str = Form(...)) -> StreamingResponse:
   contents = await file.read()
-  string_io = StringIO(contents.decode("utf-8"))
-  df = pd.read_csv(string_io)
-  headers = df.columns.tolist()
-  if df is None or len(headers) < 2:
-      return {"error": "Incorrect data format"}
-  pdf_buffer = pltpdf.errbar1x(df, headers, size)
+  file_ext = file.filename.split(".")[-1].lower()
+  data, headers = helper.load_data(file_ext, contents)
+  if len(headers) < 2 or size is None:
+    raise HTTPException(status_code=400, detail="Missing column or data!")
+  try:
+    pdf_buffer = pltpdf.errbar1x(data, headers, size)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
   return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=errbar1x.pdf"})
 
 @plot_router.post("/errbar1y")
 async def generate_errbar1x_plot(file: UploadFile = File(...), size: str = Form(...)) -> StreamingResponse:
   contents = await file.read()
-  string_io = StringIO(contents.decode("utf-8"))
-  df = pd.read_csv(string_io)
-  headers = df.columns.tolist()
-  if df is None or len(headers) < 2:
-      return {"error": "Incorrect data format"}
-  pdf_buffer = pltpdf.errbar1y(df, headers, size)
+  file_ext = file.filename.split(".")[-1].lower()
+  data, headers = helper.load_data(file_ext, contents)
+  if len(headers) < 2 or size is None:
+    raise HTTPException(status_code=400, detail="Missing column or data!")
+  try:
+    pdf_buffer = pltpdf.errbar1y(data, headers, size)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
   return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=errbar1y.pdf"})
 
 @plot_router.post("/errbar2xy")
 async def generate_errbar2xy_plot(file: UploadFile = File(...), size: str = Form(...)) -> StreamingResponse:
   contents = await file.read()
-  string_io = StringIO(contents.decode("utf-8"))
-  df = pd.read_csv(string_io)
-  headers = df.columns.tolist()
-  if df is None or len(headers) < 2:
-    return {"error": "Incorrect data format"}
-  pdf_buffer = pltpdf.errbar2xy(df, headers, size)
+  file_ext = file.filename.split(".")[-1].lower()
+  data, headers = helper.load_data(file_ext, contents)
+  if len(headers) < 2 or size is None:
+    raise HTTPException(status_code=400, detail="Missing column or data!")
+  try:
+    pdf_buffer = pltpdf.errbar2xy(data, headers, size)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
   return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=errbar2xy.pdf"})
 
 @plot_router.post("/eqhist")

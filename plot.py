@@ -42,14 +42,13 @@ def quadratic(a: float, b: float, c: float, domain: list[float], range: list[flo
   plt.close(fig)
   return buf
 
-def scatter(df: pd.DataFrame, headers: list[str], size: str):
-  x = df[headers[0]].to_numpy(dtype=float)
-  y =  df[headers[1]].to_numpy(dtype=float)
+def scatter(data: np.ndarray, headers: list[str], size: str):
+  x, y = data[0], data[1]
   if len(x) != len(y):
     raise ValueError("Columns must have the same length")
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
-  ax.scatter(x, y, fmt='o', capsize=5)
+  ax.scatter(x, y, marker='o')
   ax.set_xlabel(headers[0])
   ax.set_ylabel(headers[1])
   ax.set_title(f"Scatter Plot of {headers[0]} vs {headers[1]}")
@@ -61,15 +60,13 @@ def scatter(df: pd.DataFrame, headers: list[str], size: str):
   plt.close(fig)
   return buf
 
-def errbar1x(df: pd.DataFrame, headers: list[str], size: str):
-  x = df[headers[0]].to_numpy(dtype=float)
-  y =  df[headers[1]].to_numpy(dtype=float)
-  error = df[headers[2]]
+def errbar1x(data: np.ndarray, headers: list[str], size: str):
+  x, y, error = data[0], data[1], data[2]
   if len(x) != len(y) or len(x) != len(error):
     raise ValueError("Columns must have the same length")
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
-  ax.errorbar(x, y, xerr=error, fmt='o', capsize=5)
+  ax.errorbar(x, y, xerr=error, marker='o')
   ax.set_xlabel(headers[0])
   ax.set_ylabel(headers[1])
   ax.set_title(f"Errorbar Plot of {headers[0]} vs {headers[1]}")
@@ -81,15 +78,13 @@ def errbar1x(df: pd.DataFrame, headers: list[str], size: str):
   plt.close(fig)
   return buf
 
-def errbar1y(df: pd.DataFrame, headers: list[str], size: str):
-  x = df[headers[0]].to_numpy(dtype=float)
-  y =  df[headers[1]].to_numpy(dtype=float)
-  error = df[headers[2]].to_numpy(dtype=float)
+def errbar1y(data: np.ndarray, headers: list[str], size: str):
+  x, y, error = data[0], data[1], data[2]
   if len(x) != len(y) or len(x) != len(error):
     raise ValueError("Columns must have the same length")
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
-  ax.errorbar(x, y, yerr=error, fmt='o', capsize=5)
+  ax.errorbar(x, y, yerr=error, marker='o')
   ax.set_xlabel(headers[0])
   ax.set_ylabel(headers[1])
   ax.set_title(f"Errorbar Plot of {headers[0]} vs {headers[1]}")
@@ -101,16 +96,13 @@ def errbar1y(df: pd.DataFrame, headers: list[str], size: str):
   plt.close(fig)
   return buf
 
-def errbar2xy(df: pd.DataFrame, headers: list[str], size: str):
-  x = df[headers[0]].to_numpy(dtype=float)
-  y =  df[headers[1]].to_numpy(dtype=float)
-  error_x = df[headers[2]].to_numpy(dtype=float)
-  error_y = df[headers[3]].to_numpy(dtype=float)
+def errbar2xy(data: np.ndarray, headers: list[str], size: str):
+  x, y, error_x, error_y = data[0], data[1], data[2], data[3]
   if len(x) != len(y) or len(x) != len(error_x) or len(x) != len(error_y):
     raise ValueError("Columns must have the same length")
   fig_size = (7, 3) if size == "large" else (3.375, 3)
   fig, ax = plt.subplots(figsize=fig_size)
-  ax.errorbar(x, y, xerr=error_x, yerr=error_y, fmt='o', capsize=5)
+  ax.errorbar(x, y, xerr=error_x, yerr=error_y, marker='o')
   ax.set_xlabel(headers[0])
   ax.set_ylabel(headers[1])
   ax.set_title(f"Errorbar Plot of {headers[0]} vs {headers[1]}")

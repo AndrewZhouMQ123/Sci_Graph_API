@@ -16,7 +16,7 @@ async def generate_polyfit(
   file_ext = file.filename.split(".")[-1].lower()
   data, headers = helper.load_data(file_ext, contents)
   if len(headers) < 2 or size is None:
-    raise HTTPException(status_code=400, detail="CSV must contain at least 2 columns")
+    raise HTTPException(status_code=400, detail="Missing column or data!")
   try:
     pdf_buffer = fit.polyfit(data, headers, poly_degree, size)
   except Exception as e:
@@ -29,7 +29,7 @@ async def generate_expfit(file: UploadFile = File(...), size: str = Form(...)):
   file_ext = file.filename.split(".")[-1].lower()
   data, headers = helper.load_data(file_ext, contents)
   if len(headers) < 2 or size is None:
-    raise HTTPException(status_code=400, detail="CSV must contain at least 2 columns")
+    raise HTTPException(status_code=400, detail="Missing column or data!")
   try:
     pdf_buffer = fit.expfit(data, headers, size)
   except Exception as e:
@@ -42,7 +42,7 @@ async def generate_logfit(file: UploadFile = File(...), size: str = Form(...)):
   file_ext = file.filename.split(".")[-1].lower()
   data, headers = helper.load_data(file_ext, contents)
   if len(headers) < 2 or size is None:
-    raise HTTPException(status_code=400, detail="CSV must contain at least 2 columns")
+    raise HTTPException(status_code=400, detail="Missing column or data!")
   try:
     pdf_buffer = fit.logfit(data, headers, size)
   except Exception as e:
@@ -55,7 +55,7 @@ async def generate_gaussfit(file: UploadFile = File(...), size: str = Form(...))
   file_ext = file.filename.split(".")[-1].lower()
   data, headers = helper.load_data(file_ext, contents)
   if len(headers) < 2 or size is None:
-    raise HTTPException(status_code=400, detail="CSV must contain at least 2 columns")
+    raise HTTPException(status_code=400, detail="Missing column or data!")
   try:
     pdf_buffer = fit.gaussfit(data, headers, size)
   except Exception as e:
@@ -68,7 +68,7 @@ async def generate_powfit(file: UploadFile = File(...), size: str = Form(...)):
   file_ext = file.filename.split(".")[-1].lower()
   data, headers = helper.load_data(file_ext, contents)
   if len(headers) < 2 or size is None:
-    raise HTTPException(status_code=400, detail="CSV must contain at least 2 columns")
+    raise HTTPException(status_code=400, detail="Missing column or data!")
   try:
     pdf_buffer = fit.powfit(data, headers, size)
   except Exception as e:
@@ -81,7 +81,7 @@ async def generate_poissonfit(file: UploadFile = File(...), size: str = Form(...
   file_ext = file.filename.split(".")[-1].lower()
   data, headers = helper.load_data(file_ext, contents)
   if len(headers) < 2 or size is None:
-    raise HTTPException(status_code=400, detail="CSV must contain at least 2 columns")
+    raise HTTPException(status_code=400, detail="Missing column or data!")
   try:
     pdf_buffer = fit.poissonfit(data, headers, size)
   except Exception as e:
