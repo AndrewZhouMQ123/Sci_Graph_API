@@ -7,7 +7,7 @@ import os
 import json
 from mydb import init_db
 from main import app, verify_api_key
-# Dependency override for testing (bypass API key verification)
+
 app.dependency_overrides[verify_api_key] = lambda x_api_key=None, db=None: True
 
 client = TestClient(app)
