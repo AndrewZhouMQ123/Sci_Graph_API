@@ -1,6 +1,5 @@
 import matplotlib
 matplotlib.use('Agg')
-
 from fastapi.testclient import TestClient
 from main import app
 import pytest
@@ -8,7 +7,6 @@ import os
 import json
 from mydb import init_db
 from main import app, verify_api_key
-
 # Dependency override for testing (bypass API key verification)
 app.dependency_overrides[verify_api_key] = lambda x_api_key=None, db=None: True
 
