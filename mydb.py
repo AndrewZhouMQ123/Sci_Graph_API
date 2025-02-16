@@ -12,7 +12,7 @@ SessionLocal = None
 
 def init_db():
   global engine, SessionLocal
-  if os.getenv('IS_GITHUB_ACTIONS') == 'true':
+  if os.getenv('CI') == 'true':
     DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/test_db"
   else:
     load_dotenv()
