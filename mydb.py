@@ -8,15 +8,16 @@ import secrets
 
 Base = declarative_base()
 load_dotenv()
-USER = os.getenv("user")
 PASSWORD = os.getenv("password")
 HOST = os.getenv("host")
-PORT = os.getenv("port")
-DBNAME = os.getenv("dbname")
-if not all([USER, PASSWORD, HOST, PORT, DBNAME]):
-  raise ValueError("One or more required environment variables are missing!")
-DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
-engine = create_engine(DATABASE_URL)
+DATABASE_URL = f"postgresql+psycopg2://postgres:{PASSWORD}@{HOST}:{5432}/postgres?sslmode=require"
+engine = create_engine(
+  DATABASE_URL,
+  pool_size=10,
+  max_overflow=5,
+  pool_pre_ping=True,
+  pool_recycle=3600
+)
 
 def generate_api_key():
   return secrets.token_hex(32)
