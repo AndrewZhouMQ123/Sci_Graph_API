@@ -10,11 +10,14 @@ Base = declarative_base()
 load_dotenv()
 PASSWORD = os.getenv("password")
 HOST = os.getenv("host")
-DATABASE_URL = f"postgresql+psycopg2://postgres:{PASSWORD}@{HOST}:{5432}/postgres?sslmode=require&connection_timeout=10"
-engine = create_engine(
-  DATABASE_URL,
-  echo=True
-)
+DATABASE_URL = (f"postgresql+psycopg2://postgres:{PASSWORD}@{HOST}:5432/postgres?sslmode=require")
+print(DATABASE_URL)
+engine = create_engine(DATABASE_URL, echo=True)
+
+def init_db():
+  Base.metadata.create_all(bind=engine)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def generate_api_key():
   return secrets.token_hex(32)
@@ -24,13 +27,14 @@ class APIKey(Base):
   id = Column(Integer, primary_key=True, index=True)
   key = Column(String, unique=True, nullable=False)
   active = Column(Boolean, default=True)
-  expires_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30))
-
-def init_db():
-  Base.metadata.create_all(bind=engine)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+  expires_at = Column(
+    DateTime,
+    default=lambda: datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
+  )
 
 def get_db():
+  if not engine:
+    raise RuntimeError("Database not initialized! Call init_db() first.")
   db = SessionLocal()
   try:
     yield db
@@ -46,5 +50,5 @@ def save_api_key(api_key: str, db: Session):
 def verify_api_key(x_api_key: str = Header(None), db: Session = Depends(get_db)):
   api_key = db.query(APIKey).filter_by(key=x_api_key, active=True).first()
   if not api_key:
-      raise HTTPException(status_code=401, detail="Invalid API Key")
+    raise HTTPException(status_code=401, detail="Invalid API Key")
   return True

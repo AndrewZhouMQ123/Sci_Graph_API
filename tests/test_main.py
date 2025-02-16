@@ -8,12 +8,11 @@ import json
 from mydb import init_db
 from main import app, verify_api_key
 
-app.dependency_overrides[verify_api_key] = lambda x_api_key=None, db=None: True
-
+app.dependency_overrides[verify_api_key] = lambda: True
 client = TestClient(app)
 
 @pytest.fixture(scope="session", autouse=True)
-def initialize_database():
+def initialize_test_db():
   init_db()
 
 def test_read_main():
