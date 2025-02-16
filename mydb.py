@@ -10,13 +10,10 @@ Base = declarative_base()
 load_dotenv()
 PASSWORD = os.getenv("password")
 HOST = os.getenv("host")
-DATABASE_URL = f"postgresql+psycopg2://postgres:{PASSWORD}@{HOST}:{5432}/postgres?sslmode=require"
+DATABASE_URL = f"postgresql+psycopg2://postgres:{PASSWORD}@{HOST}:{5432}/postgres?sslmode=require&connection_timeout=10"
 engine = create_engine(
   DATABASE_URL,
-  pool_size=10,
-  max_overflow=5,
-  pool_pre_ping=True,
-  pool_recycle=3600
+  echo=True
 )
 
 def generate_api_key():
