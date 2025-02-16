@@ -7,17 +7,21 @@ from fastapi import HTTPException, Header, Depends
 import secrets
 
 Base = declarative_base()
-load_dotenv()
-PASSWORD = os.getenv("password")
-HOST = os.getenv("host")
-DATABASE_URL = (f"postgresql+psycopg2://postgres:{PASSWORD}@{HOST}:5432/postgres?sslmode=require")
-print(DATABASE_URL)
-engine = create_engine(DATABASE_URL, echo=True)
+engine = None
+SessionLocal = None
 
 def init_db():
+  global engine, SessionLocal
+  if os.getenv('IS_GITHUB_ACTIONS') == 'true':
+    DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/test_db"
+  else:
+    load_dotenv()
+    PASSWORD = os.getenv("password")
+    HOST = os.getenv("host")
+    DATABASE_URL = (f"postgresql+psycopg2://postgres:{PASSWORD}@{HOST}:5432/postgres?sslmode=require")
+  engine = create_engine(DATABASE_URL, echo=True)
   Base.metadata.create_all(bind=engine)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+  SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def generate_api_key():
   return secrets.token_hex(32)
