@@ -55,13 +55,37 @@ def test_load_data_csv():
   assert headers == ["x", "y"]
   assert np.allclose(data, expected)
 
+def test_load_matrix_csv():
+  csv_path = os.path.join(os.path.dirname(__file__), "matrix.csv")
+  with open(csv_path, "rb") as csv_file:
+    contents = csv_file.read()
+    data, headers = load_data("csv", contents)
+  expected = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+  assert np.allclose(data, expected)
+
+def test_load_cornerX_csv():
+  csv_path = os.path.join(os.path.dirname(__file__), "cornerX.csv")
+  with open(csv_path, "rb") as csv_file:
+    contents = csv_file.read()
+    data, headers = load_data("csv", contents)
+  expected = np.array([[0, 0, 0, 0], [1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3]])
+  assert np.allclose(data, expected)
+  
+def test_load_cornerY_csv():
+  csv_path = os.path.join(os.path.dirname(__file__), "cornerY.csv")
+  with open(csv_path, "rb") as csv_file:
+    contents = csv_file.read()
+    data, headers = load_data("csv", contents)
+  expected = np.array([[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]])
+  assert np.allclose(data, expected)
+
 def test_load_data_npy():
   npy_contents = io.BytesIO()
   np.save(npy_contents, np.array([[1, 2], [3, 4]]))
   npy_contents.seek(0)
   data, headers = load_data("npy", npy_contents.getvalue())
   expected = np.array([[1, 2], [3, 4]])
-  assert headers == ["x", "y"]
+  assert headers == ['x', 'y']
   assert np.allclose(data, expected)
 
 def test_load_data_npz():
@@ -70,7 +94,7 @@ def test_load_data_npz():
   npz_contents.seek(0)
   data, headers = load_data("npz", npz_contents.getvalue())
   expected = np.array([[1, 2], [3, 4]])
-  assert headers == ["x", "y"]
+  assert headers == ['x', 'y']
   assert np.allclose(data, expected)
 
 def test_load_data_hdf5():
@@ -86,5 +110,5 @@ def test_load_data_json():
   json_contents = json.dumps({"x": [1, 2], "y": [3, 4]}).encode("utf-8")
   data, headers = load_data("json", json_contents)
   expected = np.array([[1, 2], [3, 4]])
-  assert headers == ["x", "y"]
+  assert headers == ['x', 'y']
   assert np.allclose(data, expected)

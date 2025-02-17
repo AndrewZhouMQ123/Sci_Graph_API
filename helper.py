@@ -29,7 +29,9 @@ def load_data(file_ext: str, contents: bytes) -> np.ndarray:
       string_io = io.StringIO(contents.decode("utf-8"))
       df = pd.read_csv(string_io)
       headers = df.columns.tolist()
-      data = df.to_numpy(dtype=float).T
+      data = df.to_numpy(dtype=float)
+      if headers[0] != "m":
+        data = data.T
     elif file_ext == "npy":
       buf = io.BytesIO(contents)
       data = np.load(buf)

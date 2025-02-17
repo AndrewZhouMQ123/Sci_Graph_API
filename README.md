@@ -8,6 +8,7 @@
 - Relevant Title, detailed captions and legends in all plots (possibly use AI to prompt a response in future)
 - Size Option: Single Column Plot (3.375 inches * 3 inches), Double Column Plot (7 inches * 3 inches)
 - If csv columns incorrect format, then will not plot as expected
+- Try to not have duplicate headers, Pandas automatically appends numbers to duplicate colummns, so if that is not what you want, try to have unique column headers
 ## Plot API
 ### Line and Quadratic
 - API endpoints: /plot/line, /plot/quadratic
@@ -37,6 +38,7 @@
 ### Heatmap and Contour map CSV Format
 - API endpoints: /plot/imshowhmap, /plot/pmeshhmap, /plot/pmeshfunchmap, /plot/imshowhmap, /plot/contour,
 - csv numeric matrix, npy, npz, HDF5, JSON
+- require all matrices have single header value as "m" to distinguish it from ordinary data 
 - Normalization: "minmax" or "zscore"
 - Fill Missing Values Strategy: "mean", "median" or 0
 - choose cmap: https://matplotlib.org/stable/users/explain/colors/colormaps.html
