@@ -20,20 +20,6 @@ def test_read_main():
   assert response.status_code == 200
   assert response.json() == {"msg": "Hello World"}
 
-def test_line():
-  params = {"a": 1, "b": 2, "domain": [0, 4], "range": [0, 4], "num": 4}
-  response = client.post("/plot/line", data={"params": json.dumps(params)})
-  assert response.status_code == 200
-  assert response.headers["content-type"] == "application/pdf"
-  assert "inline; filename=line.pdf" in response.headers["Content-Disposition"]
-
-def test_quadratic():
-  params = {"a": 1, "b": 2, "c": 3, "domain": [0, 4], "range": [0, 4], "num": 4}
-  response = client.post("plot/quadratic", data={"params": json.dumps(params)})
-  assert response.status_code == 200
-  assert response.headers["content-type"] == "application/pdf"
-  assert "inline; filename=quadratic.pdf" in response.headers["Content-Disposition"]
-
 def test_polyfit_data():
   csv_path = os.path.join(os.path.dirname(__file__), "data.csv")
   with open(csv_path, "rb") as csv_file:

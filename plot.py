@@ -6,42 +6,6 @@ from io import BytesIO
 import scipy
 from typing import Optional
 
-def line(a: float, b: float, domain: list[float], range: list[float], num: int):
-  x = np.linspace(domain[0], domain[1], num)
-  fig = plt.figure(1, figsize=(3.375, 3))
-  ax = fig.add_subplot(111)
-  ax.plot(x, a*x + b)
-  ax.set_xlabel("x")
-  ax.set_ylabel("y")
-  ax.set_title("y = ax + b")
-  ax.set_xlim(domain[0], domain[1])
-  ax.set_ylim(range[0], range[1])
-  ax.grid()
-  fig.tight_layout()
-  buf = BytesIO()
-  fig.savefig(buf, format="pdf", bbox_inches='tight')
-  buf.seek(0)
-  plt.close(fig)
-  return buf
-
-def quadratic(a: float, b: float, c: float, domain: list[float], range: list[float], num: int):
-  x = np.linspace(domain[0], domain[1], num)
-  fig = plt.figure(1, figsize=(3.375, 3))
-  ax = fig.add_subplot(111)
-  ax.plot(x, a*x**2 + b*x + c)
-  ax.set_xlabel("x")
-  ax.set_ylabel("y")
-  ax.set_title("y = ax^2 + bx + c")
-  ax.set_xlim(domain[0], domain[1])
-  ax.set_ylim(range[0], range[1])
-  ax.grid()
-  fig.tight_layout()
-  buf = BytesIO()
-  fig.savefig(buf, format="pdf")
-  buf.seek(0)
-  plt.close(fig)
-  return buf
-
 def scatter(data: np.ndarray, headers: list[str], size: Optional[str]):
   x, y = data[0], data[1]
   if len(x) != len(y):

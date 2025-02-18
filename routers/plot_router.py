@@ -9,29 +9,6 @@ from typing import List
 
 plot_router = APIRouter(prefix="/plot")
 
-@plot_router.post("/line")
-def generate_line_plot(params: str = Form(...)) -> StreamingResponse:
-  data = json.loads(params)
-  a = data["a"]
-  b = data["b"]
-  domain = data["domain"]
-  range = data["range"]
-  num = data["num"]
-  pdf_buffer =  pltpdf.line(a, b, domain, range, num)
-  return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=line.pdf"})
-
-@plot_router.post("/quadratic")
-def generate_quadratic_plot(params: str = Form(...)) -> StreamingResponse:
-  data = json.loads(params)
-  a = data["a"]
-  b = data["b"]
-  c = data["c"]
-  domain = data["domain"]
-  range = data["range"]
-  num = data["num"]
-  pdf_buffer = pltpdf.quadratic(a, b, c, domain, range, num)
-  return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=quadratic.pdf"})
-
 @plot_router.post("/scatter")
 async def generate_scatter_plot(file: UploadFile = File(...), size: str = Form(...)) -> StreamingResponse:
   contents = await file.read()
