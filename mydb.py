@@ -31,10 +31,13 @@ class APIKey(Base):
   id = Column(Integer, primary_key=True, index=True)
   key = Column(String, unique=True, nullable=False)
   active = Column(Boolean, default=True)
-  expires_at = Column(
-    DateTime,
-    default=lambda: datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
-  )
+  expire = Column(DateTime, nullable=False)
+  hours_remaining = Column(Integer, nullable=False)
+  session_start = Column(DateTime, default=None)
+  session_active = Column(Boolean, default=False)
+
+  def is_expired(self):
+    return datetime.now() >= self.expire
 
 def get_db():
   if not engine:
@@ -46,13 +49,34 @@ def get_db():
     db.close()
 
 def save_api_key(api_key: str, db: Session):
-  expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
-  db_key = APIKey(key=api_key, active=True, expires_at=expires_at)
+  expire_date = datetime.now() + datetime.timedelta(days=30)
+  db_key = APIKey(key=api_key, active=True, expire = expire_date, hours_remaining = 100)
   db.add(db_key)
   db.commit()
 
-def verify_api_key(x_api_key: str = Header(None), db: Session = Depends(get_db)):
-  api_key = db.query(APIKey).filter_by(key=x_api_key, active=True).first()
-  if not api_key:
+def verify_api_key(api_key: str, db: Session):
+  api_key_record = db.query(APIKey).filter_by(key=api_key, active=True).first()
+  if not api_key_record.key:
     raise HTTPException(status_code=401, detail="Invalid API Key")
+  if api_key.expire < datetime.now():
+    raise HTTPException(status_code=403, detail="API key has expired")
+  if api_key.hours_remaining <= 0:
+    raise HTTPException(status_code=403, detail="API key usage limit has been reached")
+  api_key_record.session_active = True
+  api_key_record.session_start = datetime.now()
+  db.commit()
   return True
+
+def mark_expired_keys_inactive(db: Session):
+  # Get all keys where the expiration date has passed and set them to inactive
+  expired_keys = db.query(APIKey).filter(APIKey.expire < datetime.now(), APIKey.active == True).all()
+  for key in expired_keys:
+    key.active = False
+    db.commit()  # Commit the change to the database
+
+def sweep_expired_keys(db: Session):
+  # Sweep (delete) keys that are inactive
+  expired_keys = db.query(APIKey).filter(APIKey.active == False).all()
+  for key in expired_keys:
+    db.delete(key)
+  db.commit()  # Commit the delete operations

@@ -1,5 +1,5 @@
 # SCIENTIFIC GRAPH API
-- plots from given parameters or csv data
+- generates static plots / charts from given parameters or csv data
 - fits csv data from given guess parameters and returns generated plot of best fit with fit parameters
 - plots and fits are available as downloadable pdfs (best format for latex)
 
@@ -22,10 +22,6 @@
 - x : y : error x
 - x : y : error y
 - x : y : error x : error y
-### Single Histogram
-- API endpoints: /plot/eqhistogram, /plot/varyhistogram
-- Data, #no of bins for equal bin steps, xlabel, ylabel
-- Bins (list, varying steps) : Frequencies
 ### Bar graph
 - API endpoint: /plot/bar
 - data : labels
@@ -35,6 +31,10 @@
 ### Boxplot CSV Format
 - API endpoint: /plot/boxplot
 - category, value
+### Single Histogram
+- API endpoints: /plot/eqhistogram, /plot/varyhistogram
+- Data, #no of bins for equal bin steps, xlabel, ylabel
+- Bins (list, varying steps) : Frequencies
 ### Heatmap and Contour map CSV Format
 - API endpoints: /plot/imshowhmap, /plot/pmeshhmap, /plot/pmeshfunchmap, /plot/imshowhmap, /plot/contour,
 - csv numeric matrix, npy, npz, HDF5, JSON
@@ -42,6 +42,8 @@
 - Normalization: "minmax" or "zscore"
 - Fill Missing Values Strategy: "mean", "median" or 0
 - choose cmap: https://matplotlib.org/stable/users/explain/colors/colormaps.html
+- Using an integer (e.g., levels=10): Matplotlib automatically generates that many contour levels, evenly spaced between the minimum and maximum values of the data (or between specified vmin and vmax if provided). This is useful when you want a general overview of the data distribution without worrying about the exact threshold values.
+- Using a list of numbers (e.g., levels=[-1, 0, 1]): Matplotlib uses these exact numbers as the contour levels. This gives you precise control over which data values are highlighted, which is especially useful if you have specific thresholds or boundaries of interest.
 ## Best Fit API
 ### 
 

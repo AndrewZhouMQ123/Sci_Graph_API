@@ -1,8 +1,5 @@
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
 from fastapi.responses import StreamingResponse
-import json
-from io import StringIO
-import pandas as pd
 import plot as pltpdf
 import helper
 from typing import List
@@ -61,6 +58,46 @@ async def generate_errbar2xy_plot(file: UploadFile = File(...), size: str = Form
     raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
   return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=errbar2xy.pdf"})
 
+@plot_router.post("/bar")
+async def generate_bar_plot(file: UploadFile = File(...), size: str = Form(...)) -> StreamingResponse:
+  contents = await file.read()
+  file_ext = file.filename.split(".")[-1].lower()
+  data, headers = helper.load_data(file_ext, contents)
+  if len(headers) != 2:
+    raise HTTPException(status_code=400, detail="Missing column or data!")
+  try:
+    pdf_buffer = pltpdf.bar(data, headers, size)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
+  return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=bar.pdf"})
+
+@plot_router.post("/pie")
+async def generate_pie_plot(file: UploadFile = File(...), size: str = Form(...), categories: list[str] = Form(...)) -> StreamingResponse:
+  contents = await file.read()
+  file_ext = file.filename.split(".")[-1].lower()
+  data, headers = helper.load_data(file_ext, contents)
+  if len(headers) != 1:
+    raise HTTPException(status_code=400, detail="Missing column or data!")
+  try:
+    pdf_buffer = pltpdf.pie(data, categories, size)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
+  return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=pie.pdf"})
+
+@plot_router.post("/boxplot")
+async def generate_boxplot_plot(file: UploadFile = File(...), size: str = Form(...), categories: list[str] = Form(...),
+  xlabel: str = Form(...), ylabel: str = Form(...)) -> StreamingResponse:
+  contents = await file.read()
+  file_ext = file.filename.split(".")[-1].lower()
+  data, _ = helper.load_data(file_ext, contents)
+  if categories is None or xlabel is None or ylabel is None:
+    raise HTTPException(status_code=400, detail="Missing column or data!")
+  try:
+    pdf_buffer = pltpdf.boxplot(data, categories, size, xlabel, ylabel)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
+  return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=boxplot.pdf"})
+
 @plot_router.post("/eqhist")
 async def generate_eqhist_plot(
   files: List[UploadFile] = File(...), 
@@ -110,46 +147,6 @@ async def generate_varyhist_plot(
   except Exception as e:
     raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
   return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=varyhist.pdf"})
-
-@plot_router.post("/bar")
-async def generate_bar_plot(file: UploadFile = File(...), size: str = Form(...)) -> StreamingResponse:
-  contents = await file.read()
-  file_ext = file.filename.split(".")[-1].lower()
-  data, headers = helper.load_data(file_ext, contents)
-  if len(headers) != 2:
-    raise HTTPException(status_code=400, detail="Missing column or data!")
-  try:
-    pdf_buffer = pltpdf.bar(data, headers, size)
-  except Exception as e:
-    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
-  return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=bar.pdf"})
-
-@plot_router.post("/pie")
-async def generate_pie_plot(file: UploadFile = File(...), size: str = Form(...), categories: list[str] = Form(...)) -> StreamingResponse:
-  contents = await file.read()
-  file_ext = file.filename.split(".")[-1].lower()
-  data, headers = helper.load_data(file_ext, contents)
-  if len(headers) != 1:
-    raise HTTPException(status_code=400, detail="Missing column or data!")
-  try:
-    pdf_buffer = pltpdf.pie(data, categories, size)
-  except Exception as e:
-    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
-  return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=pie.pdf"})
-
-@plot_router.post("/boxplot")
-async def generate_boxplot_plot(file: UploadFile = File(...), size: str = Form(...), categories: list[str] = Form(...),
-  xlabel: str = Form(...), ylabel: str = Form(...)) -> StreamingResponse:
-  contents = await file.read()
-  file_ext = file.filename.split(".")[-1].lower()
-  data, _ = helper.load_data(file_ext, contents)
-  if categories is None or xlabel is None or ylabel is None:
-    raise HTTPException(status_code=400, detail="Missing column or data!")
-  try:
-    pdf_buffer = pltpdf.boxplot(data, categories, size, xlabel, ylabel)
-  except Exception as e:
-    raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
-  return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=boxplot.pdf"})
 
 @plot_router.post("/imshowhmap")
 async def generate_imshowhmap_plot(file: UploadFile = File(...), title: str = Form(...), cmap: str = Form(...), origin: str = Form(...),
