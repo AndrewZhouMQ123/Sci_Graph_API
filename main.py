@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-stripe.api_key = "your_stripe_secret_key"
+stripe.api_key = "sk_test_51Qu0VHPUdz2Zv0MfdRMulev0yjxAdppCyUUehSqZNrYNydaSARZCPYx3eCKalZlplfpgkokIvc8CbjcPBGQvz6hC00vrk10Mxq"
 
 app.include_router(plot_router, dependencies=[Depends(verify_api_key)])
 app.include_router(fit_router, dependencies=[Depends(verify_api_key)])
@@ -37,13 +37,13 @@ def create_checkout_session():
     session = stripe.checkout.Session.create(
       payment_method_types=["card"],
       mode="payment",
-      success_url="https://yourwebsite.com/success?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url="https://yourwebsite.com/cancel",
+      success_url="https://web-goodies.vercel.app//success?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url="https://web-goodies.vercel.app/cancel",
       line_items=[{
         "price_data": {
           "currency": "usd",
           "product_data": {"name": "API Access"},
-          "unit_amount": 1000,  # $10.00
+          "unit_amount": 500,
         },
         "quantity": 1,
       }])
