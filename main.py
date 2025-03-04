@@ -30,8 +30,7 @@ async def read_main():
   return {"msg": "Hello World"}
 
 @app.post("/generate_api_key")
-async def generate_new_key(request: Request):
-  db: Session = get_db()
+async def generate_new_key(request: Request, db: Session = Depends(get_db)):
   data = await request.json()
   token = data.get("token")
   if not token:
@@ -45,8 +44,7 @@ async def generate_new_key(request: Request):
   return {"api_key": new_api_key}
 
 @app.post("/endAPIsession")
-def endAPIsession(api_key: str):
-  db: Session = get_db()
+def endAPIsession(api_key: str, db: Session = Depends(get_db)):
   api_key_record = db.query(APIKey).filter_by(key=api_key, active=True).first()
   if not api_key_record:
     raise HTTPException(status_code=401, detail="Invalid API Key")

@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from dotenv import load_dotenv
 import os
 import datetime
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 import secrets
 
 Base = declarative_base()
@@ -54,7 +54,7 @@ def save_api_key(api_key: str, db: Session):
   db.add(db_key)
   db.commit()
 
-def verify_api_key(api_key: str, db: Session):
+def verify_api_key(api_key: str, db: Session = Depends(get_db)):
   api_key_record = db.query(APIKey).filter_by(key=api_key, active=True).first()
   if not api_key_record.key:
     raise HTTPException(status_code=401, detail="Invalid API Key")
