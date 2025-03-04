@@ -30,7 +30,8 @@ async def read_main():
   return {"msg": "Hello World"}
 
 @app.post("/generate_api_key")
-async def generate_new_key(request: Request, db: Session = Depends(get_db)):
+async def generate_new_key(request: Request):
+  db: Session = get_db()
   data = await request.json()
   token = data.get("token")
   if not token:
