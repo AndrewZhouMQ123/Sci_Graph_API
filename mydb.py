@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from dotenv import load_dotenv
 import os
 import datetime
-from fastapi import HTTPException, Header, Depends
+from fastapi import HTTPException
 import secrets
 
 Base = declarative_base()
