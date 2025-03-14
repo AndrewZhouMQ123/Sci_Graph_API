@@ -3,15 +3,11 @@ from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from dotenv import load_dotenv
 import os
 import datetime
-from fastapi import HTTPException, Depends
-import secrets
+from fastapi import HTTPException, Depends, Header
 
 Base = declarative_base()
-engine = None
-SessionLocal = None
 
 def init_db():
-  global engine, SessionLocal
   if os.getenv('CI') == 'true':
     DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/test_db"
   else:
@@ -22,9 +18,9 @@ def init_db():
   engine = create_engine(DATABASE_URL, echo=True)
   Base.metadata.create_all(bind=engine)
   SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+  return engine, SessionLocal
 
-def generate_api_key():
-  return secrets.token_hex(32)
+engine, SessionLocal = init_db()
 
 class APIKey(Base):
   __tablename__ = "api_keys"
@@ -37,7 +33,7 @@ class APIKey(Base):
   session_active = Column(Boolean, default=False)
 
   def is_expired(self):
-    return datetime.now() >= self.expire
+    return datetime.datetime.now() >= self.expire
 
 def get_db():
   if not engine:
@@ -49,27 +45,28 @@ def get_db():
     db.close()
 
 def save_api_key(api_key: str, db: Session):
-  expire_date = datetime.now() + datetime.timedelta(days=30)
+  expire_date = datetime.datetime.now() + datetime.timedelta(days=30)
   db_key = APIKey(key=api_key, active=True, expire = expire_date, hours_remaining = 100)
   db.add(db_key)
   db.commit()
 
-def verify_api_key(api_key: str, db: Session = Depends(get_db)):
-  api_key_record = db.query(APIKey).filter_by(key=api_key, active=True).first()
-  if not api_key_record.key:
+# Headers for testing, use JWT tokens in the future
+def verify_api_key(api_key: str = Header(..., alias="X-API-Key"), db: Session = Depends(get_db)) -> bool:
+  db_api_key = db.query(APIKey).filter_by(key=api_key, active=True).first()
+  if not db_api_key.key:
     raise HTTPException(status_code=401, detail="Invalid API Key")
-  if api_key.expire < datetime.now():
+  if db_api_key.expire < datetime.datetime.now():
     raise HTTPException(status_code=403, detail="API key has expired")
-  if api_key.hours_remaining <= 0:
+  if db_api_key.hours_remaining <= 0:
     raise HTTPException(status_code=403, detail="API key usage limit has been reached")
-  api_key_record.session_active = True
-  api_key_record.session_start = datetime.now()
+  db_api_key.session_active = True
+  db_api_key.session_start = datetime.datetime.now()
   db.commit()
   return True
 
 def mark_expired_keys_inactive(db: Session):
   # Get all keys where the expiration date has passed and set them to inactive
-  expired_keys = db.query(APIKey).filter(APIKey.expire < datetime.now(), APIKey.active == True).all()
+  expired_keys = db.query(APIKey).filter(APIKey.expire < datetime.datetime.now(), APIKey.active == True).all()
   for key in expired_keys:
     key.active = False
     db.commit()  # Commit the change to the database

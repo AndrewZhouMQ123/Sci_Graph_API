@@ -5,20 +5,34 @@ from routers.plot_router import plot_router
 from routers.fit_router import fit_router
 from routers.imageTransform_router import imageTransform_router
 from routers.solver_router import solver_router
-from mydb import APIKey, save_api_key, generate_api_key, verify_api_key, get_db, mark_expired_keys_inactive, sweep_expired_keys, engine
+from mydb import APIKey, save_api_key, verify_api_key, get_db, mark_expired_keys_inactive, sweep_expired_keys, init_db
 import datetime
+import secrets
+from fastapi.middleware.cors import CORSMiddleware
+
+# uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+engine, SessionLocal = init_db()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
   try:
     with engine.connect() as connection:
-      print("Connection successful!")
+      print("Database connection successful")
+    yield
   except Exception as e:
     print(f"Failed to connect: {e}")
     raise Exception(f"Database connection failed: {e}")
-  yield
+  finally:
+    engine.dispose()
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust for production
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(plot_router, dependencies=[Depends(verify_api_key)])
 app.include_router(fit_router, dependencies=[Depends(verify_api_key)])
@@ -31,15 +45,15 @@ async def read_main():
 
 @app.post("/generate_api_key")
 async def generate_new_key(request: Request, db: Session = Depends(get_db)):
-  data = await request.json()
-  token = data.get("token")
-  if not token:
-    raise HTTPException(status_code=400, detail="Missing payment token")
+  # data = await request.json()
+  # token = data.get("token")
+  # if not token:
+  #   raise HTTPException(status_code=400, detail="Missing payment token")
   # Call the cleanup on each key generation
   mark_expired_keys_inactive(db)
   sweep_expired_keys(db)
 
-  new_api_key = generate_api_key()
+  new_api_key = secrets.token_hex(32)
   save_api_key(new_api_key, db)
   return {"api_key": new_api_key}
 
