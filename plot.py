@@ -78,49 +78,6 @@ def errbar2xy(data: np.ndarray, headers: list[str], size: Optional[str]):
   plt.close(fig)
   return buf
 
-def eqhist(data: np.ndarray, weights: Optional[np.ndarray], bins: int | list[int], xlabel: str, ylabel: str, size: Optional[str]):
-  fig_size = (7, 3) if size == "large" else (3.375, 3)
-  fig, ax = plt.subplots(figsize=fig_size)
-  if data.ndim > 1:
-    data = data.flatten()
-  if weights is not None:
-    if len(data) != len(weights):
-      raise ValueError("Columns must have the same length")
-    ax.hist(data, bins=bins, weights=weights)
-  else:
-    ax.hist(data, bins=bins)
-  ax.set_xlabel(xlabel)
-  ax.set_ylabel(ylabel)
-  ax.set_title(f"Histogram of {xlabel} vs {ylabel}")
-  fig.tight_layout()
-  buf = BytesIO()
-  fig.savefig(buf, format="pdf")
-  buf.seek(0)
-  plt.close(fig)
-  return buf
-
-def varyhist(data: np.ndarray, weights: Optional[np.ndarray], xlabel: str, ylabel: str, size: Optional[str]):
-  bins, counts = data[0], data[1]
-  if len(counts) != len(bins):
-    raise ValueError("Columns must have the same length")
-  fig_size = (7, 3) if size == "large" else (3.375, 3)
-  fig, ax = plt.subplots(figsize=fig_size)
-  if weights is not None:
-    if len(counts) != len(weights):
-      raise ValueError("Columns must have the same length")
-    ax.hist(counts, bins=bins, weights=weights)
-  else:
-    ax.hist(counts, bins=bins)
-  ax.set_xlabel(xlabel)
-  ax.set_ylabel(ylabel)
-  ax.set_title(f"Histogram of {xlabel} vs {ylabel}")
-  fig.tight_layout()
-  buf = BytesIO()
-  fig.savefig(buf, format="pdf")
-  buf.seek(0)
-  plt.close(fig)
-  return buf
-
 def bar(data: np.ndarray, headers: list[str], size: Optional[str]):
   x, y = data[0], data[1]
   if len(x) != len(y):
@@ -163,6 +120,49 @@ def boxplot(data: np.ndarray, categories: list[str], size: Optional[str], xlabel
   ax.set_xlabel(xlabel)
   ax.set_ylabel(ylabel)
   ax.set_title(f"Box Plot of {np.char.join(',', categories)}")
+  fig.tight_layout()
+  buf = BytesIO()
+  fig.savefig(buf, format="pdf")
+  buf.seek(0)
+  plt.close(fig)
+  return buf
+
+def eqhist(data: np.ndarray, weights: Optional[np.ndarray], bins: int | list[int], xlabel: str, ylabel: str, size: Optional[str]):
+  fig_size = (7, 3) if size == "large" else (3.375, 3)
+  fig, ax = plt.subplots(figsize=fig_size)
+  if data.ndim > 1:
+    data = data.flatten()
+  if weights is not None:
+    if len(data) != len(weights):
+      raise ValueError("Columns must have the same length")
+    ax.hist(data, bins=bins, weights=weights)
+  else:
+    ax.hist(data, bins=bins)
+  ax.set_xlabel(xlabel)
+  ax.set_ylabel(ylabel)
+  ax.set_title(f"Histogram of {xlabel} vs {ylabel}")
+  fig.tight_layout()
+  buf = BytesIO()
+  fig.savefig(buf, format="pdf")
+  buf.seek(0)
+  plt.close(fig)
+  return buf
+
+def varyhist(data: np.ndarray, weights: Optional[np.ndarray], xlabel: str, ylabel: str, size: Optional[str]):
+  bins, counts = data[0], data[1]
+  if len(counts) != len(bins):
+    raise ValueError("Columns must have the same length")
+  fig_size = (7, 3) if size == "large" else (3.375, 3)
+  fig, ax = plt.subplots(figsize=fig_size)
+  if weights is not None:
+    if len(counts) != len(weights):
+      raise ValueError("Columns must have the same length")
+    ax.hist(counts, bins=bins, weights=weights)
+  else:
+    ax.hist(counts, bins=bins)
+  ax.set_xlabel(xlabel)
+  ax.set_ylabel(ylabel)
+  ax.set_title(f"Histogram of {xlabel} vs {ylabel}")
   fig.tight_layout()
   buf = BytesIO()
   fig.savefig(buf, format="pdf")

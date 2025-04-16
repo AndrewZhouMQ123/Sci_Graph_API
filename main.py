@@ -3,8 +3,6 @@ from contextlib import asynccontextmanager
 from sqlalchemy.orm import Session
 from routers.plot_router import plot_router
 from routers.fit_router import fit_router
-from routers.imageTransform_router import imageTransform_router
-from routers.solver_router import solver_router
 from mydb import APIKey, save_api_key, verify_api_key, get_db, mark_expired_keys_inactive, sweep_expired_keys, init_db
 import datetime
 import secrets
@@ -36,8 +34,6 @@ app.add_middleware(
 
 app.include_router(plot_router, dependencies=[Depends(verify_api_key)])
 app.include_router(fit_router, dependencies=[Depends(verify_api_key)])
-app.include_router(imageTransform_router, dependencies=[Depends(verify_api_key)])
-app.include_router(solver_router, dependencies=[Depends(verify_api_key)])
 
 @app.get("/")
 async def read_main():
