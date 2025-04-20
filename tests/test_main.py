@@ -1,19 +1,22 @@
 import matplotlib
 matplotlib.use('Agg')
 from fastapi.testclient import TestClient
+from fastapi import Depends
 from main import app
-import pytest
 import os
-import json
-from mydb import init_db
-from main import app, verify_api_key
+from main import app, get_current_user, authorize_action  # Import the dependency functions
 
-app.dependency_overrides[verify_api_key] = lambda: True
 client = TestClient(app)
 
-@pytest.fixture(scope="session", autouse=True)
-def initialize_test_db():
-  init_db()
+def mock_get_current_user():
+    return {"user_id": "test_user", "email": "test@example.com"}
+
+# Override the authorize_action dependency for testing
+def mock_authorize_action(user: dict = Depends(mock_get_current_user)):
+    return user
+
+app.dependency_overrides[get_current_user] = mock_get_current_user
+app.dependency_overrides[authorize_action] = mock_authorize_action
 
 def test_read_main():
   response = client.get("/")
