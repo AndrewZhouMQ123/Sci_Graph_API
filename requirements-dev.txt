@@ -24,6 +24,7 @@ httpcore==1.0.7
 httptools==0.6.4
 httpx==0.28.1
 idna==3.10
+iniconfig==2.0.0
 joblib==1.4.2
 kiwisolver==1.4.8
 limits==4.0.1
@@ -36,6 +37,7 @@ numpy==2.2.2
 packaging==24.2
 pandas==2.2.3
 pillow==11.1.0
+pluggy==1.5.0
 proto-plus==1.26.1
 protobuf==6.30.2
 pyasn1==0.6.1
@@ -44,6 +46,9 @@ pydantic==2.10.6
 pydantic_core==2.27.2
 Pygments==2.19.1
 pyparsing==3.2.1
+pytest==8.3.4
+python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
 python-multipart==0.0.20
 pytz==2025.1
 requests==2.32.3
