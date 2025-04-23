@@ -19,7 +19,7 @@ RESOURCE = f"projects/{GCP_PROJECT_ID}/sciencegraphapi"
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost", "https://andrewsonlinenotes.vercel.app/"],
+    allow_origins=["https://andrewsonlinenotes.vercel.app"],
     allow_methods=["*"],
     allow_headers=["Authorization"],  # Only allow the Authorization header
 )
@@ -36,7 +36,7 @@ async def get_current_user(request: FastAPIRequest, authorization: str = Header(
         idinfo = id_token.verify_oauth2_token(token, request, GOOGLE_CLIENT_ID)
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             raise HTTPException(status_code=401, detail="Invalid token issuer")
-        user_email = idinfo.get('email')
+        user_email = idinfo['email']
         if not user_email:
             raise HTTPException(status_code=401, detail="Could not retrieve user email from token")
         return {"email": user_email}
@@ -45,7 +45,6 @@ async def get_current_user(request: FastAPIRequest, authorization: str = Header(
     except Exception as e:
         print(f"Error verifying token: {e}")
         raise HTTPException(status_code=500, detail="Internal server error during token verification")
-
 
 async def authorize_action(user: dict = Depends(get_current_user)):
     """Checks if the authenticated user has the required IAM role."""
