@@ -21,7 +21,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://andrewsonlinenotes.vercel.app"],
     allow_methods=["*"],
-    allow_headers=["Authorization"],  # Only allow the Authorization header
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # --- Authentication & Authorization Dependencies ---
